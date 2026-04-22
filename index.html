@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Quant Risk Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #050810;
+    --surface: #0c1220;
+    --border: #1a2540;
+    --accent: #3a7bd5;
+    --accent2: #1d9e75;
+    --danger: #e24b4a;
+    --text: #e8eaf0;
+    --muted: #6b7a99;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-weight: 300; line-height: 1.7; }
+
+  /* grid noise texture */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image: linear-gradient(var(--border) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
+
+  /* NAV */
+  nav { padding: 1.5rem 0; border-bottom: 1px solid var(--border); }
+  nav .inner { display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-family: var(--mono); font-size: 0.85rem; color: var(--accent); letter-spacing: 0.05em; }
+  nav a { color: var(--muted); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+  nav a:hover { color: var(--text); }
+  nav ul { list-style: none; display: flex; gap: 2rem; }
+
+  /* HERO */
+  .hero { padding: 7rem 0 5rem; }
+  .tag { font-family: var(--mono); font-size: 0.75rem; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1.5rem; }
+  h1 { font-size: clamp(2.2rem, 5vw, 3.5rem); font-weight: 300; line-height: 1.15; margin-bottom: 1.5rem; }
+  h1 strong { font-weight: 500; color: #fff; }
+  .subtitle { font-size: 1.05rem; color: var(--muted); max-width: 520px; margin-bottom: 3rem; }
+  .cta-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent); color: #fff; text-decoration: none;
+    padding: 0.75rem 1.75rem; border-radius: 4px; font-size: 0.9rem; font-weight: 500;
+    transition: opacity 0.2s;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid var(--border); color: var(--muted); text-decoration: none;
+    padding: 0.75rem 1.75rem; border-radius: 4px; font-size: 0.9rem;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--muted); color: var(--text); }
+
+  /* METRICS STRIP */
+  .metrics-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 5rem 0; }
+  .metric-item { background: var(--surface); padding: 1.25rem 1.5rem; }
+  .metric-label { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .metric-value { font-family: var(--mono); font-size: 1.4rem; font-weight: 600; }
+  .pos { color: var(--accent2); }
+  .neg { color: var(--danger); }
+  .neu { color: var(--text); }
+
+  /* FEATURES */
+  .section-label { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 3rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 6rem; }
+  .feature { padding: 1.5rem; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); }
+  .feature-icon { font-family: var(--mono); font-size: 0.8rem; color: var(--accent); margin-bottom: 0.75rem; }
+  .feature h3 { font-size: 0.95rem; font-weight: 500; margin-bottom: 0.5rem; }
+  .feature p { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+
+  /* STACK */
+  .stack { margin-bottom: 6rem; }
+  .stack-items { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+  .pill { font-family: var(--mono); font-size: 0.8rem; padding: 0.4rem 1rem; border: 1px solid var(--border); border-radius: 100px; color: var(--muted); }
+
+  /* FORMULA */
+  .formula-block { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 2rem; margin-bottom: 6rem; }
+  .formula-block h2 { font-size: 1rem; font-weight: 500; margin-bottom: 1.5rem; }
+  .formula { font-family: var(--mono); font-size: 0.85rem; color: var(--accent); background: var(--bg); padding: 0.75rem 1rem; border-radius: 4px; margin-bottom: 0.5rem; overflow-x: auto; }
+  .formula-desc { font-size: 0.82rem; color: var(--muted); margin-bottom: 1rem; }
+
+  /* FOOTER */
+  footer { border-top: 1px solid var(--border); padding: 2rem 0; color: var(--muted); font-size: 0.82rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  footer a { color: var(--muted); text-decoration: none; }
+  footer a:hover { color: var(--text); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="container inner">
+    <span class="logo">[ QUANT_RISK_v1.0 ]</span>
+    <ul>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#methodology">Methodology</a></li>
+      <li><a href="https://github.com/YOUR_USERNAME/quant-risk-dashboard" target="_blank">GitHub</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+
+  <section class="hero">
+    <p class="tag">Quantitative Finance · Portfolio Analytics</p>
+    <h1>Real-time <strong>Risk Dashboard</strong><br>for equity portfolios</h1>
+    <p class="subtitle">Enter any ticker symbol and explore VaR, CVaR, Sharpe ratio, Monte Carlo simulations, and more — powered by live market data.</p>
+    <div class="cta-row">
+      <a href="https://your-app.streamlit.app" target="_blank" class="btn-primary">
+        ▶ Launch live app
+      </a>
+      <a href="https://github.com/YOUR_USERNAME/quant-risk-dashboard" target="_blank" class="btn-ghost">
+        View source →
+      </a>
+    </div>
+  </section>
+
+  <div class="metrics-strip">
+    <div class="metric-item"><div class="metric-label">Sharpe ratio</div><div class="metric-value neu">1.84</div></div>
+    <div class="metric-item"><div class="metric-label">VaR 95% (1d)</div><div class="metric-value neg">−2.14%</div></div>
+    <div class="metric-item"><div class="metric-label">CVaR 95%</div><div class="metric-value neg">−3.40%</div></div>
+    <div class="metric-item"><div class="metric-label">Max drawdown</div><div class="metric-value neg">−28.3%</div></div>
+    <div class="metric-item"><div class="metric-label">Ann. return</div><div class="metric-value pos">+34.2%</div></div>
+    <div class="metric-item"><div class="metric-label">Beta vs SPY</div><div class="metric-value neu">1.21</div></div>
+  </div>
+
+  <section id="features">
+    <p class="section-label">// Features</p>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">01 · RISK</div>
+        <h3>VaR & CVaR</h3>
+        <p>Historical simulation Value at Risk and Conditional VaR (Expected Shortfall) at configurable confidence levels.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">02 · PERF</div>
+        <h3>Performance metrics</h3>
+        <p>Sharpe, Sortino, Beta, Alpha, rolling correlation vs benchmark. Annualized figures with risk-free rate input.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">03 · DIST</div>
+        <h3>Distribution analysis</h3>
+        <p>Return histogram with Jarque-Bera normality test, skewness and excess kurtosis to detect fat tails.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">04 · MC</div>
+        <h3>Monte Carlo simulation</h3>
+        <p>Geometric Brownian Motion price path simulation with 5th/95th percentile bands and P(profit) estimate.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">05 · DATA</div>
+        <h3>Live market data</h3>
+        <p>Real-time prices via Yahoo Finance. Supports any global equity ticker. Data cached for performance.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">06 · VIZ</div>
+        <h3>Interactive charts</h3>
+        <p>Fully interactive Plotly charts — zoom, pan, hover. Drawdown, cumulative returns, rolling correlation.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="stack">
+    <p class="section-label">// Tech stack</p>
+    <div class="stack-items">
+      <span class="pill">Python</span>
+      <span class="pill">Streamlit</span>
+      <span class="pill">yfinance</span>
+      <span class="pill">NumPy</span>
+      <span class="pill">Pandas</span>
+      <span class="pill">SciPy</span>
+      <span class="pill">Plotly</span>
+      <span class="pill">Streamlit Cloud</span>
+      <span class="pill">GitHub Pages</span>
+    </div>
+  </section>
+
+  <section id="methodology" class="formula-block">
+    <h2>// Methodology</h2>
+
+    <div class="formula">VaR_α = −Q_α(r_t)</div>
+    <p class="formula-desc">Historical simulation VaR — α-quantile of the empirical return distribution.</p>
+
+    <div class="formula">CVaR_α = −E[r_t | r_t ≤ VaR_α]</div>
+    <p class="formula-desc">Expected Shortfall — mean loss conditional on exceeding VaR.</p>
+
+    <div class="formula">Sharpe = (R_p − R_f) / σ_p</div>
+    <p class="formula-desc">Annualized risk-adjusted return relative to configurable risk-free rate.</p>
+
+    <div class="formula">S_{t+Δt} = S_t · exp[(μ − σ²/2)Δt + σ√Δt · Z],  Z ~ N(0,1)</div>
+    <p class="formula-desc">Geometric Brownian Motion — Monte Carlo price path simulation.</p>
+  </section>
+
+</div>
+
+<div class="container">
+  <footer>
+    <span>Built for quantitative finance portfolio · 2024</span>
+    <span>
+      <a href="https://github.com/YOUR_USERNAME/quant-risk-dashboard" target="_blank">GitHub</a>
+      &nbsp;·&nbsp;
+      <a href="https://linkedin.com/in/YOUR_PROFILE" target="_blank">LinkedIn</a>
+    </span>
+  </footer>
+</div>
+
+</body>
+</html>
