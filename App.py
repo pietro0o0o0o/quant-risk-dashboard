@@ -44,7 +44,7 @@ def load_data(ticker, benchmark, period):
     t = t["Close"].squeeze()
     b = b["Close"].squeeze()
     df = pd.DataFrame({"stock": t, "bench": b}).dropna()
-    return df, yf.Ticker(ticker).info
+    try:     info = yf.Ticker(ticker).fast_info     return df, {"longName": ticker, "sector": ""} except:     return df, {"longName": ticker, "sector": ""}
 
 def calc_metrics(df, confidence, rf_rate):
     rets = df["stock"].pct_change().dropna()
