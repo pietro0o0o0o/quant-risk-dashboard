@@ -15,8 +15,8 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    .metric-card { border-radius: 8px; padding: 1rem; border: 1px solid var(--border); }
-    .stMetric { border-radius: 8px; padding: 0.5rem; }
+    .metric-card { background: #0e1117; border-radius: 8px; padding: 1rem; border: 1px solid #1e2130; }
+    .stMetric { background: #0e1117; border-radius: 8px; padding: 0.5rem; }
     h1 { font-size: 1.8rem !important; }
 </style>
 """, unsafe_allow_html=True)
@@ -44,7 +44,11 @@ def load_data(ticker, benchmark, period):
     t = t["Close"].squeeze()
     b = b["Close"].squeeze()
     df = pd.DataFrame({"stock": t, "bench": b}).dropna()
-    try:     info = yf.Ticker(ticker).fast_info     return df, {"longName": ticker, "sector": ""} except:     return df, {"longName": ticker, "sector": ""}
+    try:
+        info = yf.Ticker(ticker).fast_info
+        return df, {"longName": ticker, "sector": ""}
+    except Exception:
+        return df, {"longName": ticker, "sector": ""}
 
 def calc_metrics(df, confidence, rf_rate):
     rets = df["stock"].pct_change().dropna()
