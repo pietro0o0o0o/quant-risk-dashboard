@@ -15,8 +15,14 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    .metric-card { background: #0e1117; border-radius: 8px; padding: 1rem; border: 1px solid #1e2130; }
-    .stMetric { background: #0e1117; border-radius: 8px; padding: 0.5rem; }
+    [data-testid="stMetric"] {
+        background: #1a1f2e;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+    }
+    [data-testid="stMetricLabel"] p { color: #a0aec0 !important; }
+    [data-testid="stMetricValue"] { color: #ffffff !important; }
+    [data-testid="stMetricDelta"] { color: #a0aec0 !important; }
     h1 { font-size: 1.8rem !important; }
 </style>
 """, unsafe_allow_html=True)
