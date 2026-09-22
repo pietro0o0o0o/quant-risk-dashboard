@@ -2,7 +2,7 @@
 
 > Real-time portfolio risk analytics built with Python, Streamlit, and Plotly.
 
-**[🚀 Live Demo](https://your-app.streamlit.app)** — enter any ticker and explore risk metrics instantly.
+**[🚀 Live Demo](https://quant-risk-dashboard-calvaruso.streamlit.app/)** — enter any ticker and explore risk metrics instantly.
 
 ---
 
@@ -29,7 +29,7 @@
 ## Run locally
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/quant-risk-dashboard
+git clone https://github.com/pietro0o0o0o/quant-risk-dashboard
 cd quant-risk-dashboard
 pip install -r requirements.txt
 streamlit run app.py
@@ -62,8 +62,9 @@ quant-risk-dashboard/
 
 ## Author
 
-Built as part of a quantitative finance portfolio.  
-Connect on [LinkedIn](https://linkedin.com/in/YOUR_PROFILE).
+Pietro Calvaruso — Economics & Management student at Bocconi University, interested in quantitative finance and investment management.
+
+Connect on [LinkedIn](https://linkedin.com/in/pietro-calvaruso) · [GitHub](https://github.com/pietro0o0o0o)
 
 ---
 
